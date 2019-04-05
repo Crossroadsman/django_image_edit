@@ -1,0 +1,6 @@
+# Unlike `.gitignore`, patterns that match a directory do not recursively
+# match paths inside that directory. Wherever you would use `path/` in
+# `.gitignore`, use `path/**` in `.gitattributes`.
+# See:
+# https://git-scm.com/docs/gitattributes
+guillotine/static/guillotine/vendor/** linguist-vendored
