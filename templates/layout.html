@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- {% load static from staticfiles %} -->
-<!-- {% load course_extras %} {# registered template tags #} -->
+
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -24,6 +24,7 @@
 
     {% block content %}{% endblock %}
 
+    <!-- BEGIN DEBUG INFORMATION-->
     <div id="django-debug" class="row">
       <pre>
         {% filter force_escape %}
@@ -31,6 +32,7 @@
         {% endfilter %}
       </pre>
     </div>
+    <!-- END DEBUG INFORMATION -->
 
     {% block javascript %}{% endblock %}
   </body>

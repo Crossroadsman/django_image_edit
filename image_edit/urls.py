@@ -76,6 +76,7 @@ from django.urls import path, re_path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    re_path(r'^', include('app.urls', namespace='app')),
     re_path(r'users/', include('users.urls')),
     re_path(r'users/', include('django.contrib.auth.urls')),
 ]
