@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% comment %}
+  The section in `.ksuser` relates to the custom user and auth behaviour.
+
+  Note that even though we are using a custom user model, it gets passed to
+  the template as `user`. And we don't need to manually include `user` in the
+  context: it is automatically passed as part of the request(?).
+{% endcomment %}
+
+{% block title %}Image Edit Demo{% endblock %}
+
+{% block content %}
+  <div class="ksuser">
+    {% if user.is_authenticated %}
+      Hi {{ user.username }}
+      <p><a href="{% url 'logout' %}">Log out</a></p>
+    {% else %} {# not authenticated #}
+      <p>You are not currently logged in</p>
+      <p><a href="{% url 'login' %}">Log in</a> |
+         <a href="{% url 'signup' %}">Sign up</a>
+      </p>
+    {% endif %} {# user.is_authenticated #}
+  </div><!-- end .ksuser -->
+
+  <div class="row">
+    <h1>Welcome</h1>
+    <p>This is The Image Edit Demo Site.</p>
+    <p>{{ extra_data }}</p>
+  </div>
+
+{% endblock content %}

@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% comment %}
+  The section in `.ksuser` relates to the custom user and auth behaviour
+{% endcomment %}
+
+{% block title %}Log In{% endblock %}
+
+{% block content %}
+  <div class="ksuser">
+    <h1>Log In</h1>
+
+    <form method="POST">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Log in</button>
+    </form>
+  </div>
+{% endblock content %}

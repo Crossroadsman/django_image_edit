@@ -1,0 +1,37 @@
+<!doctype html>
+<!-- {% load static from staticfiles %} -->
+<!-- {% load course_extras %} {# registered template tags #} -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}{% endblock %}</title>
+
+    <!-- <link rel="stylesheet" href="{% static 'css/layout.css' %}"> -->
+    {% block css %}{% endblock %}
+
+  </head>
+
+  <body>
+    {% if messages %}
+      {% for message in messages %}
+        <div class="{{ message.tags }}">
+          {{ message }}
+        </div>
+      {% endfor %} {# messages #}
+    {% endif %} {# messages #}
+
+    {% block content %}{% endblock %}
+
+    <div id="django-debug" class="row">
+      <pre>
+        {% filter force_escape %}
+          {% debug %}
+        {% endfilter %}
+      </pre>
+    </div>
+
+    {% block javascript %}{% endblock %}
+  </body>
+</html>
