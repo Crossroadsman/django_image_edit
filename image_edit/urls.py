@@ -24,6 +24,8 @@ Including another URLconf
 # patterns list, we can override any builtins by putting our same-named
 # routes before the builtins.
 
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, re_path, include
 
@@ -77,6 +79,13 @@ from django.urls import path, re_path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^', include('app.urls', namespace='app')),
+    re_path(r'guillotine/', include('guillotine.urls', namespace='guillotine')),
     re_path(r'users/', include('users.urls')),
     re_path(r'users/', include('django.contrib.auth.urls')),
 ]
+
+# Note, the `static` helper function only works in debug mode. For prod,
+# these patterns need to be configured in the webserver (e.g., Nginx)
+# see:
+# https://docs.djangoproject.com/en/2.2/howto/static-files/#serving-files-uploaded-by-a-user-during-development
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

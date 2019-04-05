@@ -30,6 +30,7 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
+MEDIA_DIR = BASE_DIR  # change this later
 
 
 # Quick-start development settings - unsuitable for production
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
     'app.apps.AppConfig',
+    'guillotine.apps.GuillotineConfig',
 ]
 
 MIDDLEWARE = [
@@ -147,6 +149,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# Media files
+MEDIA_ROOT = MEDIA_DIR
+MEDIA_URL = '/media/'
 
 
 # LOGIN_URL is where `login_required` will redirect users that are not logged in
