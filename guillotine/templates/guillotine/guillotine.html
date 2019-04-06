@@ -24,8 +24,14 @@
     <img id="guillotine-picture" src="{{ image.image.url }}">
 
     <div id="guillotine-controls">
-      <button id="rotate-left-button">Rotate Left</button>
-      <button id="zoom-in-button">Zoom In</button>
+      <div id="guillotine-transform-controls">
+          <button id="rotate-left-button">Rotate Left</button>
+          <button id="rotate-right-button">Rotate Right</button>
+      </div>
+      <div id="guillotine-navigate-controls">
+          <button id="zoom-in-button">Zoom In</button>
+          <button id="zoom-out-button">Zoom Out</button>
+      </div>
       <div id="guillotine-serverside-controls">
           <button id="process-button">Process</button>
       </div>
@@ -49,10 +55,19 @@
       $('#rotate-left-button').click( function(){
         picture.guillotine('rotateLeft');
       } );
+      // - rotate right
+      $('#rotate-right-button').click( function(){
+        picture.guillotine('rotateRight');
+      } );
+
 
       // - zoom in
       $('#zoom-in-button').click( function(){
         picture.guillotine('zoomIn');
+      } );
+      // - zoom out
+      $('#zoom-out-button').click( function(){
+        picture.guillotine('zoomOut');
       } );
 
       // - etc
