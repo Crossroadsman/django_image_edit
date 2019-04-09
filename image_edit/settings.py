@@ -178,3 +178,14 @@ LOGIN_REDIRECT_URL = 'home'
 # view is rendered instead.
 # Also accepts named URL patterns
 LOGOUT_REDIRECT_URL = 'home'
+
+
+# AJAX and CSRF
+# See:
+# https://docs.djangoproject.com/en/2.2/ref/csrf/#ajax
+# Step 1 - Get CSRF token:
+# - if CSRF_USE_SESSIONS is False (default) and CSRF_COOKIE_HTTPONLY is False
+#   (default):
+#   - get the csrftoken cookie in the JS
+# Step 2 - Use the token in the AJAX request:
+#   - If using jQuery, see the example code at https://docs.djangoproject.com/en/2.2/ref/csrf/#setting-the-token-on-the-ajax-request

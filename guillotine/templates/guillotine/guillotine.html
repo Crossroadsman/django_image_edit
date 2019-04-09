@@ -38,6 +38,8 @@
     </div> <!-- end #guillotine-controls -->
   </div> <!-- end #guillotine -->
 
+  <!-- Enable CSRF -->
+  <script src="{% static 'guillotine/js/csrf.js' %}"></script>
   <!-- instantiate the plugin -->
   <script>
     // make sure the image is loaded using `onload` event, `complete` property
@@ -72,19 +74,15 @@
 
       // - etc
 
-      // Handle cropping instructions
-      // - we use the `getData` function to get the cropping instructions
-      // (as JSON)
-      let instructions = picture.guillotine('getData');
-
-      function sendToServer() {
+      function sendToServer(instructions) {
         // this uses ajax to send the JSON to the server
         /* jQuery's `post` method takes the following args
            - POST URL
            - payload
            - callback (currently void)
         */ 
-        $.post("process", instructions, () => {});
+        //$.post("process", instructions, () => {});
+        $.post("{{ id }}/process", instructions, () => {});
 
         // prevent reloading of the page
         event.preventDefault();
@@ -94,7 +92,14 @@
       // will look something like:
       // { scale: 1.4, angle: 270, x: 10, y: 20, w: 400, h: 300 }
       $('#process-button').click( function(){
-        sendToServer();
+        // Handle cropping instructions
+        // - we use the `getData` function to get the cropping instructions
+        // (as JSON)
+        const instructions = picture.guillotine('getData'); // raw JSON object
+        const jstring = JSON.stringify(instructions); // string representing JSON
+
+        // then we send the JSON string to the server
+        sendToServer(jstring);
       } );
 
       // Note: see
