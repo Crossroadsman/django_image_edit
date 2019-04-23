@@ -2,20 +2,20 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 
-from .forms import ImageForm
+from .forms import PictureForm
 
 
 def app_main(request):
 
     if request.method == "POST":
-        image_form = ImageForm(request.POST, request.FILES)
-        if image_form.is_valid():
-            image_form.save()
+        picture_form = PictureForm(request.POST, request.FILES)
+        if picture_form.is_valid():
+            picture_form.save()
             return redirect(reverse('app:main'))
 
     else:  # GET
-        image_form = ImageForm()
+        picture_form = PictureForm()
 
     template = 'app/app.html'
-    context = {'image_form': image_form}
+    context = {'image_form': picture_form}
     return render(request, template, context)

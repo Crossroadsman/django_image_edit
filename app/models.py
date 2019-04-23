@@ -15,7 +15,12 @@ def image_path(instance, filename):
     return f'images/{prefix}/{filename}'
 
 
-class ThingWithImage(models.Model):
+'''It's probably best to isolate the Image as its own model, which can be
+1-to-1 linked with whatever model would be associated with the image. Thus
+we'll call this model Picture and it will just have two fields: the 
+ImageField and a text description field.
+'''
+class Picture(models.Model):
 
     text = models.CharField(max_length=255, blank=True, default='')
 

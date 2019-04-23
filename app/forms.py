@@ -1,11 +1,12 @@
 from django import forms
 
-from .models import ThingWithImage
+from .models import Picture
 
-class ImageForm(forms.ModelForm):
+
+class PictureForm(forms.ModelForm):
 
     class Meta:
-        model = ThingWithImage
+        model = Picture
         fields = ("text", "image")
 
         labels = {

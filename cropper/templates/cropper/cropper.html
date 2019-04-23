@@ -1,0 +1,157 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cropper | Picture List</title>
+
+    <!-- vendor files (order as per https://github.com/fengyuanchen/jquery-cropper ) -->
+    <!-- note the vendor now recommends using the pure JS version:
+        https://github.com/fengyuanchen/cropperjs
+    -->
+    <script src="{% static 'cropper/vendor/jquery/jquery.js' %}"></script>
+    <script src="{% static 'cropper/vendor/cropper/cropper.js' %}"></script>
+    <link href="{% static 'cropper/vendor/cropper/cropper.css' %}" rel="stylesheet">
+    <script src="{% static 'cropper/vendor/cropper/jquery-cropper.js' %}"></script>
+  </head>
+  <body>
+    <h1>Cropper: Picture List</h1>
+
+    <!-- Image upload form -->
+    <div style="border: 2px solid green;">
+      {% comment %}
+      The following form looks very similar to the form in the 'app' app.
+      However, behind the scenes it has several hidden fields that will be
+      populated by our JavaScript based on the Cropper actions.
+      {% endcomment %}
+      <form method="POST" enctype="multipart/form-data" id="upload-form">
+        {% csrf_token %}
+        {{ form }}
+      </form>
+    </div>
+    
+    <!-- Modal to crop the image -->
+    <div id="crop-modal" style="border: 2px solid red;">
+      <div id="crop-modal-header">
+        <h4>
+          Crop the Picture
+          <button type="button">&times;</button>
+        </h4>        
+      </div><!-- end #crop-modal-header -->
+      <div id="crop-modal-body">
+        <!-- this is the element that will be populated with the Cropper
+        interface.
+        NOTE: the 100% max-width property is required by Cropper
+        -->
+        <img src="" id="image" style="max-width: 100%;">
+      </div><!-- end #crop-modal-body -->
+      <div id="crop-modal-footer">
+        <button type="button" id="js-zoom-in">zoom in</button>
+        <button type="button" id="js-zoom-out">zoom out</button>
+        <button type="button">Cancel</button>
+        <button type="button" id="js-crop-and-upload">Upload</button>
+      </div><!-- end #crop-modal-footer -->
+    </div><!-- end #crop-modal -->
+
+    <!-- Container to display images -->
+    <div style="border: 2px solid blue;">
+      {% for picture in pictures %}
+        <img src="{{ picture.image.url }}">
+      {% endfor %}
+    </div>
+
+
+    <!-- JS -->
+    <script>
+      // make sure everything is loaded. Either use the `onload` event or
+      // the complete property
+      window.onload = function() {
+
+        /* Add event listener to listen for changes in #id_file (triggered by
+        the user selecting an image using the form).
+        This captures the pointer to the image:
+        - loads the image that was chosen by the user
+        - waits for the load operation to complete, then:
+          - assigns its URL to the `src` attribute of #image
+          - opens the modal view
+        */
+        $("#id_file").change(
+          function () {
+            console.log("Inside the change event handler on #id_file")
+            if (this.files && this.files[0]) {
+              var fileReader = new FileReader(); // https://developer.mozilla.org/en-US/docs/Web/API/FileReader
+              fileReader.onload = function (e) {
+                $("#image").attr("src", e.target.result);
+                $("#crop-modal").modal("show");
+              }
+              fileReader.readAsDataURL(this.files[0]);
+            }
+          }
+        );
+
+        /* Cropper Functionality */
+        var $image = $("#image");  // create a variable that points to a JQ selector that has selected the #image element
+        var cropBoxData;
+        var canvasData;
+        
+        $("crop-modal").on("shown.bs.modal", function () {
+          $image.cropper({
+            viewMode: 1,
+            aspectRatio: 4/3,
+            minCropBoxWidth: 200,
+            minCropBoxHeight: 150,
+            ready: function () {
+              $image.cropper("setCanvasData", canvasData);
+              $image.cropper("setCropBoxData", cropBoxData);
+            }
+          });
+        }).on("hidden.bs.modal", function() {
+          cropBoxData = $image.cropper("getCropBoxData");
+          canvasData = $image.cropper("getCanvasData");
+          $image.cropper("destroy");
+        });
+
+        // Enable zoom buttons
+        $("#js-zoom-in").click(function () {
+          $image.cropper("zoom", 0.1);
+        });
+
+        $("#js-zoom-out").click(function () {
+          $image.cropper("zoom", -0.1);
+        });
+
+        // See Cropper docs for more button options
+
+
+        /* add event listener to POST the Cropper data when the button is clicked */
+        $("#process").click(function () {
+
+          /* Get the cropper data, takes form of a JSON object:
+            {
+              "x": 100,
+              "y": 75,
+              "width": 800,
+              "height": 600,
+              "rotate": 45,
+              "scaleX": 2,
+              "scaleY": 2
+            }
+          */
+          var cropperData = $image.cropper("getData");
+
+          // Use the Cropper data to populate the hidden fields on the form
+          $("#id_x").val(cropData["x"])
+          $("#id_y").val(cropData["y"])
+          $("#id_width").val(cropData["width"])
+          $("#id_height").val(cropData["height"])
+
+          // Submit the form
+          $("#upload-form").submit()
+        });
+
+      };
+    </script>
+  </body>
+</html>
