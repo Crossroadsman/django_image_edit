@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
     'app.apps.AppConfig',
-    'guillotine.apps.GuillotineConfig',
+    'cropper.apps.CropperConfig',
 ]
 
 MIDDLEWARE = [
