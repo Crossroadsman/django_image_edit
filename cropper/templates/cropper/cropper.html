@@ -107,6 +107,11 @@
         });
 
         cropButton.addEventListener('click', function () {
+          if (document.getElementById('upload-image-label')) {
+            // early exit if no image has been uploaded yet
+            return;
+          }
+
           if (cropper) {
             return;
           } else {
@@ -175,9 +180,18 @@
 
 
         acceptButton.addEventListener('click', function() {
-          // if a cropper is active, send the cropped portion of the image,
-          // otherwise send the contents of the image tag
-          console.log("Submitting to server!")
+          if (document.getElementById('upload-image-label')) {
+            // early exit if no image has been uploaded yet
+            return;
+          }
+
+          if (!cropper) {
+            // send the image in the #image element
+            console.log("no cropper, just sending the image from the image element");
+          } else {
+            // send the cropped portion of the cropper object.
+            console.log("cropper active, cropping and sending to server");
+          }
         });
 
         // Cropper Transformation Functions
@@ -300,8 +314,6 @@
         function createImageTag(imageData) {
           image = document.createElement('img');
           image.setAttribute('src', imageData);
-          //image.setAttribute('height', "auto");
-          //image.setAttribute('width', "100%");
           image.style = 'max-width: 100%;'
           editorDiv.removeChild(uploadDiv);
           editorDiv.appendChild(image);
