@@ -56,7 +56,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
     'app.apps.AppConfig',
-    #'guillotine.apps.GuillotineConfig',
     'cropper.apps.CropperConfig',
 ]
 
@@ -190,3 +189,7 @@ LOGOUT_REDIRECT_URL = 'home'
 #   - get the csrftoken cookie in the JS
 # Step 2 - Use the token in the AJAX request:
 #   - If using jQuery, see the example code at https://docs.djangoproject.com/en/2.2/ref/csrf/#setting-the-token-on-the-ajax-request
+
+# MAXIMUM UPLOAD SIZE
+# (Default is 2.5MB expressed as bytes: 2621440)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
