@@ -37,10 +37,14 @@
           -->
           <div id="image-editor-image" class="col">
             <div id="upload-image">
-              <label id="upload-image-label" class="label" data-toggle="tooltip" title="Upload an Image">
-                <img id="image" src="{% static 'cropper/icons/upload.png' %}" class="img-fluid" style="max-width: 100%;">  
-                <input type="file" class="sr-only" id="input" name="image" accepts="image/*">
-              </label>
+              <!-- hidden form -->
+              <form enctype="multipart/form-data" id="upload-form" method="POST" action="upload_image">
+                {% csrf_token %}
+                <label id="upload-image-label" class="label" data-toggle="tooltip" title="Upload an Image">
+                  <img id="image" src="{% static 'cropper/icons/upload.png' %}" class="img-fluid" style="max-width: 100%;">  
+                  <input type="file" class="sr-only" id="input" name="image" accepts="image/*">
+                </label>
+              </form>
               <!-- Tell Bootstrap to hide the paragraph (display:none) on XS and larger (i.e., all devices) then override that for SM and larger to show the element again. Need to do this way because Bootstrap settings apply to a particular size class and above -->
               <span id="chooseText" class="d-none d-sm-block p-sm-2 text-light" style="font-family: 'Courier New', Courier, monospace">Choose File</span>
             </div>
@@ -66,31 +70,33 @@
               <button type="button" id="editor-cancel" class="btn px-0"><img src="{% static 'cropper/icons/cancel.png' %}"></button>
             </div>
         </div>
-    
-        
-    
       </div><!-- end #image-editor-->
 
     </div> <!-- end .container -->
-    
+
+
 
     <!-- JS. Note that most Bootstrap components require jQuery and Popper.js, 
     in addition to Bootstrap's own JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
     <!-- cropper.js -->
     <script src="{% static 'cropper/vendor/cropperjs/cropper.js' %}"></script>
 
+    <!-- Enable CSRF -->
+    <script src="{% static 'cropper/js/csrf.js' %}"></script>
+
     <script>
-      window.addEventListener('DOMContentLoaded', function () {
+      window.onload = function () {
 
         // elements
         var editorDiv = document.getElementById('image-editor-image');
         var uploadDiv = document.getElementById('upload-image');
         var input = document.getElementById('input');
         var image = document.getElementById('image');
+        var uploadForm = document.getElementById('upload-form');
 
         var cropButton = document.getElementById('editor-crop');
         var rotateLeftButton = document.getElementById('editor-rotate-left');
@@ -107,7 +113,7 @@
         });
 
         cropButton.addEventListener('click', function () {
-          if (document.getElementById('upload-image-label')) {
+          if (!imageUploaded()) {
             // early exit if no image has been uploaded yet
             return;
           }
@@ -120,7 +126,7 @@
         });
 
         rotateLeftButton.addEventListener('click', function () {
-          if (document.getElementById('upload-image-label')) {
+          if (!imageUploaded()) {
             // early exit if no image has been uploaded yet
             return;
           }
@@ -139,7 +145,7 @@
         });
 
         rotateRightButton.addEventListener('click', function () {
-          if (document.getElementById('upload-image-label')) {
+          if (!imageUploaded()) {
             // early exit if no image has been uploaded yet
             return;
           }
@@ -159,7 +165,7 @@
 
         flipButton.addEventListener('click', function () {
           
-          if (document.getElementById('upload-image-label')) {
+          if (!imageUploaded()) {
             // early exit if no image has been uploaded yet
             return;
           }
@@ -180,18 +186,42 @@
 
 
         acceptButton.addEventListener('click', function() {
-          if (document.getElementById('upload-image-label')) {
+          if (!imageUploaded()) {
             // early exit if no image has been uploaded yet
             return;
           }
 
           if (!cropper) {
             // send the image in the #image element
-            console.log("no cropper, just sending the image from the image element");
-          } else {
-            // send the cropped portion of the cropper object.
-            console.log("cropper active, cropping and sending to server");
+            input.disabled = false;
+            uploadForm.submit()
+            return;
           }
+
+          // send the cropped portion of the cropper object.
+          console.log("cropper active, cropping and sending to server");
+
+          canvas = cropper.getCroppedCanvas();
+          console.log("canvas: ", canvas);
+          canvas.toBlob((blob) => {
+            var formData = new FormData();
+            formData.append('image', blob);
+
+            $.ajax('upload_image', {
+              method: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success() {
+                console.log('success!');
+              },
+              error() {
+                console.log('upload error');
+              },
+            });
+          });
+          
+
         });
 
         // Cropper Transformation Functions
@@ -293,7 +323,6 @@
           }
         }
 
-
         function imageFromFile(input_element) {
           // check that a file has been selected
           if (input_element.files && input_element.files[0]) {
@@ -312,17 +341,23 @@
         }
 
         function createImageTag(imageData) {
-          image = document.createElement('img');
+          //image = document.createElement('img');
           image.setAttribute('src', imageData);
           image.style = 'max-width: 100%;'
-          editorDiv.removeChild(uploadDiv);
-          editorDiv.appendChild(image);
+          image.className += " uploaded-true"
+          //editorDiv.removeChild(uploadDiv);
+          //editorDiv.appendChild(image);
+          input.disabled = true;
 
+        }
+
+        function imageUploaded() {
+          return image.className.includes('uploaded-true');
         }
 
 
 
-      });
+      };
     </script>
   </body>
 </html>
