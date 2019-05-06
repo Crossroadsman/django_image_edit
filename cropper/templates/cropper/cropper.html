@@ -230,11 +230,14 @@
             console.log("Cropper needs to be instantiated");
             return;
           }
+          console.log("Performing rotate transformation")
 
           // Get dimensions
-          var imageData = cropper.getImageData();
+          var imageData = getImageData();
           var currentDimensions = getCurrentDimensions();
 
+          console.log("imageData: ", imageData);
+          console.log("currentDimensions: ", currentDimensions);
           var angle = 90;
           if (!clockwise) {
             angle = -90;
@@ -254,7 +257,7 @@
         }
 
         function flipHorizontal() {
-          var imageData = cropper.getImageData();
+          var imageData = getImageData();
           
           var flipX;
           var flipY;
@@ -284,6 +287,23 @@
 
 
         // Other Functions
+        function getImageData() {
+          // the imageData object returned by Cropper's getImageData() method
+          // does not include values for rotation and scale for PNGs (at least
+          // prior to the first rotate or scale action)
+          let imageData = cropper.getImageData()
+          if (!imageData.hasOwnProperty('rotate')) {
+            imageData.rotate = 0;
+          }
+          if (!imageData.hasOwnProperty('scaleX')) {
+            imageData.scaleX = 1;
+          }
+          if (!imageData.hasOwnProperty('scaleY')) {
+            imageData.scaleY = 1;
+          }
+          return imageData;
+          
+        }
         function getCurrentDimensions() {
           // Cropper always describes height and width according to the
           // original orientation. However, we often want to work with the
@@ -294,7 +314,7 @@
           }
 
           // Query Cropper for dimensions
-          var imageData = cropper.getImageData();
+          var imageData = getImageData();
 
           // Compute current dimensions
           switch (imageData.rotate) {
